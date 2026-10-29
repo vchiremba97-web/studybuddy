@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Assignments | StudyBuddy</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="app-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <a class="brand" th:href="@{/dashboard}">
+            StudyBuddy<span>.</span>
+        </a>
+
+        <div class="nav-label">WORKSPACE</div>
+
+        <nav>
+            <a class="nav-link" th:href="@{/dashboard}">
+                <span class="nav-icon">⌂</span>
+                Dashboard
+            </a>
+
+            <a class="nav-link" th:href="@{/courses}">
+                <span class="nav-icon">▦</span>
+                My courses
+            </a>
+
+            <a class="nav-link active" th:href="@{/assignments}">
+                <span class="nav-icon">☷</span>
+                Assignments
+            </a>
+
+            <a class="nav-link" th:href="@{/planner}">
+                <span class="nav-icon">◷</span>
+                Study planner
+            </a>
+
+            <a class="nav-link" th:href="@{/progress}">
+                <span class="nav-icon">↗</span>
+                My progress
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            Your goals, your pace.<br>
+            A little progress every day.
+        </div>
+    </aside>
+
+    <!-- Main area -->
+    <div class="main-area">
+
+        <header class="topbar">
+            <div>
+                <div class="page-label">YOUR PERSONAL STUDY SPACE</div>
+                <div class="topbar-title">Assignments</div>
+            </div>
+
+            <div class="profile-chip">
+                <div class="avatar">S</div>
+                <span>Student</span>
+            </div>
+        </header>
+
+        <main class="page-content">
+
+            <!-- Welcome section -->
+            <section class="welcome-row">
+                <div>
+                    <h1>Stay on top of your work <span> </span></h1>
+                    <p class="muted">
+                        Keep track of deadlines, organise your coursework
+                        and focus on what needs to be done next.
+                    </p>
+                </div>
+
+                <a class="button" href="#add-assignment">
+                    + Add an assignment
+                </a>
+            </section>
+
+            <!-- Assignment summary -->
+            <section class="stats-grid">
+
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span>Total assignments</span>
+                        <span class="stat-icon">☷</span>
+                    </div>
+                    <div class="stat-number"
+                         th:text="${assignments == null ? 0 : #lists.size(assignments)}">
+                        0
+                    </div>
+                    <div class="stat-note">Coursework recorded</div>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span>High priority</span>
+                        <span class="stat-icon">!</span>
+                    </div>
+                    <div class="stat-number"
+                         th:text="${assignments == null ? 0 : #lists.size(assignments.?[priority == 'High'])}">
+                        0
+                    </div>
+                    <div class="stat-note">Assignments to prioritise</div>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span>Medium priority</span>
+                        <span class="stat-icon">◷</span>
+                    </div>
+                    <div class="stat-number"
+                         th:text="${assignments == null ? 0 : #lists.size(assignments.?[priority == 'Medium'])}">
+                        0
+                    </div>
+                    <div class="stat-note">Keep these on your radar</div>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span>Low priority</span>
+                        <span class="stat-icon">✓</span>
+                    </div>
+                    <div class="stat-number"
+                         th:text="${assignments == null ? 0 : #lists.size(assignments.?[priority == 'Low'])}">
+                        0
+                    </div>
+                    <div class="stat-note">Plan these into your week</div>
+                </article>
+
+            </section>
+
+            <!-- Assignment form -->
+            <section class="panel" id="add-assignment">
+
+                <div class="panel-heading">
+                    <h2>Add an assignment</h2>
+                </div>
+
+                <p class="muted">
+                    Record your coursework so you can keep upcoming
+                    deadlines in one place.
+                </p>
+
+                <form th:action="@{/assignments/add}"
+                      method="post"
+                      class="course-form">
+
+                    <div class="form-grid">
+
+                        <div class="form-group">
+                            <label for="title">Assignment title *</label>
+                            <input id="title"
+                                   name="title"
+                                   type="text"
+                                   placeholder="e.g. Database project"
+                                   required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="course">Course *</label>
+                            <input id="course"
+                                   name="course"
+                                   type="text"
+                                   placeholder="e.g. Software Engineering"
+                                   required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="dueDate">Due date *</label>
+                            <input id="dueDate"
+                                   name="dueDate"
+                                   type="date"
+                                   required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="priority">Priority</label>
+                            <select id="priority" name="priority">
+                                <option value="Medium">Medium</option>
+                                <option value="High">High</option>
+                                <option value="Low">Low</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <button type="submit" class="button">
+                        Add assignment ＋
+                    </button>
+                </form>
+
+                <div class="notice">
+                    <strong>Tip for staying organised</strong>
+                    <p>
+                        Give urgent assignments a high priority and
+                        break larger projects into smaller study tasks.
+                    </p>
+                </div>
+
+            </section>
+
+            <!-- Assignment list -->
+            <section class="panel">
+
+                <div class="panel-heading">
+                    <h2>Your deadlines</h2>
+                    <span class="count"
+                          th:text="${assignments == null ? '0 assignments' : #lists.size(assignments) + ' assignments'}">
+                        0 assignments
+                    </span>
+                </div>
+
+                <p class="muted">
+                    Review your recorded coursework and the deadlines
+                    you need to prepare for.
+                </p>
+
+                <!-- Empty state -->
+                <div class="empty-state"
+                     th:if="${assignments == null or #lists.isEmpty(assignments)}">
+
+                    <div class="empty-icon">✧</div>
+
+                    <h3>Your assignment list is ready</h3>
+
+                    <p>
+                        Add your first assignment above to start
+                        tracking your coursework and deadlines.
+                    </p>
+
+                    <a class="button button-secondary"
+                       href="#add-assignment">
+                        Create your first assignment
+                    </a>
+                </div>
+
+                <!-- Existing assignments -->
+                <div class="task-list"
+                     th:if="${assignments != null and !#lists.isEmpty(assignments)}">
+
+                    <article class="task-row"
+                             th:each="assignment : ${assignments}">
+
+                        <div class="task-info">
+                            <strong th:text="${assignment.title}">
+                                Assignment title
+                            </strong>
+
+                            <small>
+                                <span th:text="${assignment.course}">
+                                    Course
+                                </span>
+                                <span> · Due </span>
+                                <span th:text="${assignment.dueDate}">
+                                    Date
+                                </span>
+                            </small>
+                        </div>
+
+                        <span class="priority"
+                              th:classappend="${assignment.priority != null ? #strings.toLowerCase(assignment.priority) : 'medium'}"
+                              th:text="${assignment.priority != null ? assignment.priority : 'Medium'}">
+                            Medium
+                        </span>
+
+                    </article>
+
+                </div>
+
+                <div class="progress-note">
+                    <span class="progress-sparkle">✦</span>
+                    <span>
+                        Stay consistent, plan ahead and take each
+                        assignment one step at a time.
+                    </span>
+                </div>
+
+            </section>
+
+        </main>
+    </div>
+</div>
+</body>
+</html>

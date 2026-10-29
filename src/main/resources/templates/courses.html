@@ -1,0 +1,157 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Courses | StudyBuddy</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="app-layout">
+
+    <aside class="sidebar">
+        <div class="brand">Study<span>Buddy</span></div>
+        <p class="sidebar-label">WORKSPACE</p>
+
+        <nav>
+            <a th:href="@{/dashboard}">Dashboard</a>
+            <a th:href="@{/courses}" class="active">My Courses</a>
+            <a th:href="@{/assignments}">Assignments</a>
+            <a th:href="@{/planner}">Study Planner</a>
+            <a th:href="@{/progress}">My Progress</a>
+        </nav>
+
+        <div class="sidebar-bottom">Your personal study space.</div>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">YOUR LEARNING</p>
+                <h1>My Courses</h1>
+                <p class="muted">Organise your subjects in one place.</p>
+            </div>
+        </header>
+
+        <!-- Add Course Form -->
+        <section class="panel">
+            <div class="section-heading">
+                <div>
+                    <h2>Add a course</h2>
+                    <p class="muted">
+                        Enter the details for a subject you're studying.
+                    </p>
+                </div>
+            </div>
+
+            <form th:action="@{/courses/add}" method="post"
+                  class="course-form">
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label for="name">Course name *</label>
+                        <input id="name" name="name" type="text"
+                               placeholder="e.g. Software Engineering"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="code">Course code</label>
+                        <input id="code" name="code" type="text"
+                               placeholder="e.g. SWE201">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="instructor">Instructor</label>
+                        <input id="instructor" name="instructor"
+                               type="text"
+                               placeholder="Instructor's name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <input id="description" name="description"
+                               type="text"
+                               placeholder="What is this course about?">
+                    </div>
+
+                </div>
+
+                <button type="submit" class="primary-button">
+                    + Add Course
+                </button>
+            </form>
+        </section>
+
+        <!-- Course List -->
+        <section class="panel">
+            <div class="section-heading">
+                <div>
+                    <h2>Your subjects</h2>
+                    <p class="muted">
+                        <span th:text="${#lists.size(courses)}">0</span>
+                        courses added
+                    </p>
+                </div>
+            </div>
+
+            <div th:if="${#lists.isEmpty(courses)}"
+                 class="empty-state">
+                <h3>No courses yet</h3>
+                <p>Add your first course using the form above.</p>
+            </div>
+
+            <div class="course-grid"
+                 th:unless="${#lists.isEmpty(courses)}">
+
+                <article class="course-card"
+                         th:each="course : ${courses}">
+
+                    <div class="course-card-top">
+                        <div class="course-icon"></div>
+
+                        <span class="course-code"
+                              th:text="${course.code != null and !course.code.isBlank() ? course.code : 'COURSE'}">
+                            COURSE
+                        </span>
+                    </div>
+
+                    <h3 th:text="${course.name}">
+                        Course name
+                    </h3>
+
+                    <p class="muted"
+                       th:if="${course.instructor != null and !course.instructor.isBlank()}"
+                       th:text="'Instructor: ' + ${course.instructor}">
+                        Instructor
+                    </p>
+
+                    <p class="course-description"
+                       th:if="${course.description != null and !course.description.isBlank()}"
+                       th:text="${course.description}">
+                        Course description
+                    </p>
+
+                    <form th:action="@{/courses/delete}"
+                          method="post">
+                        <input type="hidden"
+                               name="id"
+                               th:value="${course.id}">
+
+                        <button type="submit"
+                                class="secondary-button">
+                            Delete course
+                        </button>
+                    </form>
+
+                </article>
+            </div>
+        </section>
+
+    </main>
+</div>
+</body>
+</html>

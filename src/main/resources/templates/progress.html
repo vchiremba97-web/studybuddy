@@ -1,0 +1,105 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Record | StudyBuddy</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="app-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="brand">Study<span>Buddy</span></div>
+
+        <p class="sidebar-label">WORKSPACE</p>
+
+        <nav>
+            <a th:href="@{/dashboard}">Dashboard</a>
+            <a th:href="@{/courses}">My Courses</a>
+            <a th:href="@{/assignments}">Assignments</a>
+            <a th:href="@{/planner}">Study Planner</a>
+            <a th:href="@{/progress}" class="active">Study Record</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            Small steps make progress.
+        </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">YOUR JOURNEY</p>
+                <h1>Study Record</h1>
+                <p class="muted">
+                    Review your study activity and stay motivated.
+                </p>
+            </div>
+        </header>
+
+        <!-- Summary cards -->
+        <section class="stats-grid">
+
+            <article class="stat-card">
+                <div class="stat-icon">▦</div>
+                <h3 th:text="${courseCount != null ? courseCount : 0}">
+                    0
+                </h3>
+                <p>Courses added</p>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-icon">☷</div>
+                <h3 th:text="${assignmentCount != null ? assignmentCount : 0}">
+                    0
+                </h3>
+                <p>Assignments recorded</p>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-icon"> </div>
+                <h3>Start here</h3>
+                <p>Your next study milestone</p>
+            </article>
+
+        </section>
+
+        <!-- Learning journey -->
+        <section class="panel">
+            <div class="section-heading">
+                <div>
+                    <h2>Your learning journey</h2>
+                    <p class="muted">
+                        Your activity summary will grow as you use StudyBuddy.
+                    </p>
+                </div>
+            </div>
+
+            <div class="empty-state">
+                <h3>Build your study record</h3>
+
+                <p>
+                    Add your courses, record assignments and use your
+                    study planner regularly.
+                </p>
+
+                <p>
+                    Study sessions and completed tasks can be tracked
+                    in a future step.
+                </p>
+
+                <a th:href="@{/courses}" class="primary-button">
+                    Explore my courses
+                </a>
+            </div>
+        </section>
+
+    </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,279 @@
+```html
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dashboard | StudyBuddy</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="app-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <a class="brand" th:href="@{/dashboard}">
+            StudyBuddy<span>.</span>
+        </a>
+
+        <div class="nav-label">WORKSPACE</div>
+
+        <nav>
+            <a class="nav-link active" th:href="@{/dashboard}">
+                <span class="nav-icon">⌂</span>
+                Dashboard
+            </a>
+
+            <a class="nav-link" th:href="@{/courses}">
+                <span class="nav-icon">▦</span>
+                My courses
+            </a>
+
+            <a class="nav-link" th:href="@{/assignments}">
+                <span class="nav-icon">☷</span>
+                Assignments
+            </a>
+
+            <a class="nav-link" th:href="@{/planner}">
+                <span class="nav-icon">◷</span>
+                Study planner
+            </a>
+
+            <a class="nav-link" th:href="@{/progress}">
+                <span class="nav-icon">↗</span>
+                My progress
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            Your goals, your pace.<br>
+            A little progress every day.
+        </div>
+    </aside>
+
+    <!-- Main content -->
+    <div class="main-area">
+
+        <header class="topbar">
+            <div>
+                <div class="page-label">YOUR PERSONAL STUDY SPACE</div>
+                <div class="topbar-title">Dashboard</div>
+            </div>
+
+            <div class="profile-chip">
+                <div class="avatar">S</div>
+                <span>Student</span>
+            </div>
+        </header>
+
+        <main class="page-content">
+
+            <!-- Welcome section -->
+            <section class="welcome-row">
+                <div>
+                    <h1>Welcome to StudyBuddy <span> </span></h1>
+                    <p class="muted">
+                        Stay organized, focus on your priorities and make
+                        steady progress toward your academic goals.
+                    </p>
+                </div>
+
+                <a class="button" th:href="@{/assignments}">
+                    + Add an assignment
+                </a>
+            </section>
+
+            <!-- Summary cards -->
+            <section class="stats-grid">
+
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span>Active courses</span>
+                        <span class="stat-icon">▦</span>
+                    </div>
+                    <div class="stat-number"
+                         th:text="${courseCount != null ? courseCount : 0}">0</div>
+                    <div class="stat-note">Your subjects</div>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span>Pending tasks</span>
+                        <span class="stat-icon">☷</span>
+                    </div>
+                    <div class="stat-number"
+                         th:text="${assignmentCount != null ? assignmentCount : 0}">0</div>
+                    <div class="stat-note">Assignments added</div>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span>Study hours</span>
+                        <span class="stat-icon">◷</span>
+                    </div>
+                    <div class="stat-number">0h</div>
+                    <div class="stat-note">Record your study sessions</div>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span>Completed tasks</span>
+                        <span class="stat-icon">✓</span>
+                    </div>
+                    <div class="stat-number">0%</div>
+                    <div class="stat-note">Completion rate</div>
+                </article>
+
+            </section>
+
+            <!-- Dashboard panels -->
+            <section class="content-grid">
+
+                <!-- Left column -->
+                <div>
+
+                    <!-- Upcoming assignments -->
+                    <article class="panel">
+                        <div class="panel-heading">
+                            <h2>Upcoming assignments</h2>
+                            <a th:href="@{/assignments}">View all →</a>
+                        </div>
+
+                        <div class="empty-state"
+                             th:if="${assignments == null or #lists.isEmpty(assignments)}">
+                            <strong>Your study journey starts here.</strong>
+                            <p>
+                                Add an assignment to keep track of your
+                                deadlines and priorities.
+                            </p>
+                            <a class="button button-secondary"
+                               th:href="@{/assignments}">
+                                Add your first assignment
+                            </a>
+                        </div>
+
+                        <div th:if="${assignments != null and !#lists.isEmpty(assignments)}">
+                            <div class="assignment-item"
+                                 th:each="assignment : ${assignments}">
+                                <strong th:text="${assignment.title}">
+                                    Assignment title
+                                </strong>
+                                <p>
+                                    <span th:text="${assignment.course}">Course</span>
+                                    <span> · Due: </span>
+                                    <span th:text="${assignment.dueDate}">Due date</span>
+                                </p>
+                                <span class="priority-badge"
+                                      th:text="${assignment.priority}">
+                                    Medium
+                                </span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Course overview -->
+                    <article class="panel">
+                        <div class="panel-heading">
+                            <h2>Course overview</h2>
+                            <a th:href="@{/courses}">Manage courses →</a>
+                        </div>
+
+                        <div class="empty-state"
+                             th:if="${courses == null or #lists.isEmpty(courses)}">
+                            <strong>No courses added yet</strong>
+                            <p>
+                                Add your subjects to start organizing your
+                                academic workload.
+                            </p>
+                            <a class="button button-secondary"
+                               th:href="@{/courses}">
+                                Add a course
+                            </a>
+                        </div>
+
+                        <div class="course-grid"
+                             th:if="${courses != null and !#lists.isEmpty(courses)}">
+                            <div class="course-card"
+                                 th:each="course : ${courses}">
+                                <h3 th:text="${course.name}">Course name</h3>
+
+                                <p th:if="${course.code != null and !#strings.isEmpty(course.code)}"
+                                   th:text="${course.code}">
+                                    Course code
+                                </p>
+
+                                <p th:if="${course.instructor != null and !#strings.isEmpty(course.instructor)}"
+                                   th:text="${course.instructor}">
+                                    Instructor
+                                </p>
+                            </div>
+                        </div>
+                    </article>
+
+                </div>
+
+                <!-- Right column -->
+                <div>
+
+                    <!-- Weekly progress -->
+                    <article class="panel">
+                        <div class="panel-heading">
+                            <h2>Your weekly progress</h2>
+                            <a th:href="@{/progress}">Details →</a>
+                        </div>
+
+                        <div class="progress-row">
+                            <div class="progress-label">
+                                <span>Task completion</span>
+                                <span>0%</span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-fill"
+                                     style="width: 0%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="progress-row">
+                            <div class="progress-label">
+                                <span>Weekly study goal</span>
+                                <span>0%</span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-fill green"
+                                     style="width: 0%;"></div>
+                            </div>
+                        </div>
+
+                        <p class="muted">
+                            Track your study habits, monitor your progress
+                            and build a consistent study routine.
+                        </p>
+                    </article>
+
+                    <!-- Study planner shortcut -->
+                    <article class="panel">
+                        <div class="panel-heading">
+                            <h2>Plan your next study session</h2>
+                            <span class="stat-icon">◷</span>
+                        </div>
+
+                        <p class="muted">
+                            Organize your time, prioritize upcoming deadlines
+                            and create a study routine that works for you.
+                        </p>
+
+                        <a class="button button-secondary"
+                           th:href="@{/planner}">
+                            Open study planner →
+                        </a>
+                    </article>
+
+                </div>
+
+            </section>
+        </main>
+    </div>
+</div>
+</body>
+</html>
+```

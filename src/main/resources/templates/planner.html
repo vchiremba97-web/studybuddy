@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Study Planner | StudyBuddy</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="app-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <a class="brand" th:href="@{/dashboard}">
+            StudyBuddy<span>.</span>
+        </a>
+
+        <div class="nav-label">WORKSPACE</div>
+
+        <nav>
+            <a class="nav-link" th:href="@{/dashboard}">
+                <span class="nav-icon">⌂</span>
+                Dashboard
+            </a>
+
+            <a class="nav-link" th:href="@{/courses}">
+                <span class="nav-icon">▦</span>
+                My courses
+            </a>
+
+            <a class="nav-link" th:href="@{/assignments}">
+                <span class="nav-icon">☷</span>
+                Assignments
+            </a>
+
+            <a class="nav-link active" th:href="@{/planner}">
+                <span class="nav-icon">◷</span>
+                Study planner
+            </a>
+
+            <a class="nav-link" th:href="@{/progress}">
+                <span class="nav-icon">↗</span>
+                My progress
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            Your goals, your pace.<br>
+            A little progress every day.
+        </div>
+    </aside>
+
+    <!-- Main area -->
+    <div class="main-area">
+
+        <header class="topbar">
+            <div>
+                <div class="page-label">YOUR PERSONAL STUDY SPACE</div>
+                <div class="topbar-title">Study planner</div>
+            </div>
+
+            <div class="profile-chip">
+                <div class="avatar">S</div>
+                <span>Student</span>
+            </div>
+        </header>
+
+        <main class="page-content">
+
+            <!-- Welcome section -->
+            <section class="welcome-row">
+                <div>
+                    <h1>Plan your study time <span> </span></h1>
+                    <p class="muted">
+                        Turn your workload into manageable tasks, organise
+                        deadlines and make steady progress toward your goals.
+                    </p>
+                </div>
+
+                <a class="button" href="#add-task">
+                    + Add a task
+                </a>
+            </section>
+
+            <!-- Task summary -->
+            <section class="stats-grid">
+
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span>Total tasks</span>
+                        <span class="stat-icon">☷</span>
+                    </div>
+                    <div class="stat-number"
+                         th:text="${tasks.size()}">0</div>
+                    <div class="stat-note">Tasks in your planner</div>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span>Completed</span>
+                        <span class="stat-icon">✓</span>
+                    </div>
+                    <div class="stat-number"
+                         th:text="${#lists.size(tasks.?[completed])}">0</div>
+                    <div class="stat-note">Tasks you have finished</div>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span>Still to do</span>
+                        <span class="stat-icon">◷</span>
+                    </div>
+                    <div class="stat-number"
+                         th:text="${#lists.size(tasks.?[!completed])}">0</div>
+                    <div class="stat-note">Tasks waiting for you</div>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span>Completion</span>
+                        <span class="stat-icon">↗</span>
+                    </div>
+                    <div class="stat-number"
+                         th:text="${tasks.isEmpty() ? 0 : (100 * #lists.size(tasks.?[completed]) / tasks.size()) + '%'}">0%</div>
+                    <div class="stat-note">Of your planner tasks</div>
+                </article>
+
+            </section>
+
+            <!-- Planner content -->
+            <section class="content-grid">
+
+                <!-- Add task form -->
+                <div class="panel" id="add-task">
+                    <div class="panel-heading">
+                        <h2>Add a task</h2>
+                    </div>
+
+                    <p class="muted">
+                        What would you like to work on?
+                    </p>
+
+                    <form th:action="@{/planner}"
+                          th:object="${taskForm}"
+                          method="post">
+
+                        <label for="title">Task title</label>
+                        <input id="title"
+                               type="text"
+                               th:field="*{title}"
+                               placeholder="e.g. Review chapter 3"
+                               required>
+
+                        <small class="error"
+                               th:if="${#fields.hasErrors('title')}"
+                               th:errors="*{title}"></small>
+
+                        <label for="subject">Subject</label>
+                        <input id="subject"
+                               type="text"
+                               th:field="*{subject}"
+                               placeholder="e.g. Database Systems"
+                               required>
+
+                        <small class="error"
+                               th:if="${#fields.hasErrors('subject')}"
+                               th:errors="*{subject}"></small>
+
+                        <label for="dueDate">Due date</label>
+                        <input id="dueDate"
+                               type="date"
+                               th:field="*{dueDate}"
+                               required>
+
+                        <small class="error"
+                               th:if="${#fields.hasErrors('dueDate')}"
+                               th:errors="*{dueDate}"></small>
+
+                        <label for="priority">Priority</label>
+                        <select id="priority" th:field="*{priority}">
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                        </select>
+
+                        <button class="button full-width" type="submit">
+                            Add to planner ＋
+                        </button>
+                    </form>
+
+                    <div class="notice">
+                        <strong>Stay organised</strong>
+                        <p>
+                            Choose a realistic deadline and priority for
+                            each task. Focus on one step at a time.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Task list -->
+                <div class="panel">
+                    <div class="panel-heading">
+                        <h2>Your tasks</h2>
+                        <span class="count"
+                              th:text="${tasks.size()} + ' tasks'">0 tasks</span>
+                    </div>
+
+                    <p class="muted">
+                        A clear view of what you need to do next.
+                    </p>
+
+                    <!-- Empty state -->
+                    <div class="empty-state"
+                         th:if="${#lists.isEmpty(tasks)}">
+                        <div class="empty-icon">✧</div>
+                        <h3>Your list starts here</h3>
+                        <p>
+                            Add a task using the form to start organising
+                            your study workload.
+                        </p>
+                        <a class="button button-secondary" href="#add-task">
+                            Create your first task
+                        </a>
+                    </div>
+
+                    <!-- Task list -->
+                    <div class="task-list"
+                         th:unless="${#lists.isEmpty(tasks)}">
+
+                        <article class="task-row"
+                                 th:each="task : ${tasks}"
+                                 th:classappend="${task.completed} ? ' is-complete' : ''">
+
+                            <form th:action="@{/planner/{id}/toggle(id=${task.id})}"
+                                  method="post">
+                                <button class="round-check"
+                                        type="submit"
+                                        th:aria-label="${task.completed} ? 'Mark incomplete' : 'Mark complete'"
+                                        th:text="${task.completed} ? '✓' : ''">
+                                </button>
+                            </form>
+
+                            <div class="task-info">
+                                <strong th:text="${task.title}">
+                                    Task title
+                                </strong>
+
+                                <small>
+                                    <span th:text="${task.subject}">Subject</span>
+                                    <span> · Due </span>
+                                    <span th:text="${#temporals.format(task.dueDate, 'd MMM yyyy')}">
+                                        Date
+                                    </span>
+                                </small>
+                            </div>
+
+                            <span class="priority"
+                                  th:classappend="${#strings.toLowerCase(task.priority)}"
+                                  th:text="${task.priority}">
+                                Medium
+                            </span>
+
+                            <form th:action="@{/planner/{id}/delete(id=${task.id})}"
+                                  method="post">
+                                <button class="delete-button"
+                                        type="submit"
+                                        aria-label="Delete task"
+                                        title="Delete task">
+                                    ×
+                                </button>
+                            </form>
+
+                        </article>
+                    </div>
+
+                    <div class="progress-note">
+                        <span class="progress-sparkle">✦</span>
+                        <span>
+                            Small steps build strong study habits. Keep going!
+                        </span>
+                    </div>
+                </div>
+
+            </section>
+        </main>
+    </div>
+</div>
+</body>
+</html>
