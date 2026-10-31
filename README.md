@@ -1,29 +1,33 @@
-# StudyBuddy starter
 
-A Java 17 + Spring Boot + Thymeleaf starter website for a student study planner.
+# StudyBuddy
 
-## Included
+A Java 17 + Spring Boot + Thymeleaf study planner designed to help university and high school students organise their academic work.
+
+## Features
 - Responsive landing page
-- Study planner page
-- Add tasks with subject, due date, and priority
-- Mark tasks complete and delete them
-- Sample tasks on first launch
-- Responsive CSS styling
+- Dashboard overview
+- Course management
+- Assignment tracking
+- Study planner
+- Add tasks with subjects, due dates, and priorities
+- Mark tasks as complete and delete them
+- Progress overview
+- Responsive design
 
 ## Requirements
 - Java 17 or later
 - IntelliJ IDEA
-- Internet access for Maven to download dependencies on first run
+- Maven
 
-## Run in IntelliJ
-1. Extract the ZIP.
-2. In IntelliJ, choose **Open** and select the extracted `StudyBuddy` folder (the folder containing `pom.xml`).
-3. Trust/open the Maven project and wait for dependency import to finish.
-4. Open `src/main/java/com/studybuddy/StudyBuddyApplication.java`.
-5. Run `StudyBuddyApplication`.
-6. Open http://localhost:8080 in your browser.
+## Run locally
+1. Open the StudyBuddy folder in IntelliJ.
+2. Wait for Maven dependencies to finish loading.
+3. Open `StudyBuddyApplication.java`.
+4. Run the application.
+5. Visit http://localhost:8080.
 
-## Important starter limitations
-- Planner tasks are stored in memory and reset when the application restarts.
-- There is no registration/login, persistent database, real reminder delivery, or AI API integration yet.
-- Do not publish this starter as a multi-user service until authentication, database persistence, per-user access control, and production configuration are implemented.
+## Current limitations
+- Tasks and courses are stored in memory and may reset when the application restarts.
+- User registration and login are not yet implemented.
+- A persistent database is not yet configured.
+- This version is intended for testing and demonstration, not production use with private student information.
