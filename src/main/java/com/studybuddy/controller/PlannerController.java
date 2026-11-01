@@ -1,8 +1,15 @@
 
 package com.studybuddy.controller;
 
+import com.studybuddy.model.Student;
 import com.studybuddy.model.StudyTask;
+import com.studybuddy.service.PlannerService;
+import com.studybuddy.service.StudentService;
+
 import jakarta.validation.Valid;
+
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -13,49 +20,54 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Controller
 @RequestMapping("/planner")
 public class PlannerController {
 
-    // Starter-only in-memory storage. Tasks reset when the application restarts.
-    private final List<StudyTask> tasks = new ArrayList<>();
-    private final AtomicLong ids = new AtomicLong(1);
+    private final PlannerService plannerService;
+    private final StudentService studentService;
 
-    public PlannerController() {
-        tasks.add(new StudyTask(
-                ids.getAndIncrement(),
-                "Review lecture notes",
-                "Database Systems",
-                LocalDate.now().plusDays(1),
-                "High",
-                false
-        ));
+    public PlannerController(
+            PlannerService plannerService,
+            StudentService studentService) {
 
-        tasks.add(new StudyTask(
-                ids.getAndIncrement(),
-                "Prepare practice questions",
-                "Software Engineering",
-                LocalDate.now().plusDays(3),
-                "Medium",
-                false
-        ));
+        this.plannerService = plannerService;
+        this.studentService = studentService;
+    }
+
+    private Student getCurrentStudent(UserDetails userDetails) {
+        if (userDetails == null) {
+            throw new IllegalStateException("No student is logged in.");
+        }
+
+        Student student = studentService.findByEmail(userDetails.getUsername());
+
+        if (student == null) {
+            throw new IllegalStateException("Student account not found.");
+        }
+
+        return student;
+    }
+
+    private void addPlannerAttributes(Model model, Student student) {
+        model.addAttribute("tasks", plannerService.getTasks(student.getId()));
+        model.addAttribute("studentName", student.getFullName());
+        model.addAttribute("today", LocalDate.now());
+        model.addAttribute("tomorrow", LocalDate.now().plusDays(1));
     }
 
     @GetMapping
-    public String planner(Model model) {
-        model.addAttribute(
-                "tasks",
-                tasks.stream()
-                        .sorted(Comparator.comparing(StudyTask::getDueDate))
-                        .toList()
-        );
+    public String planner(
+            Model model,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        Student student = getCurrentStudent(userDetails);
+
+        addPlannerAttributes(model, student);
 
         model.addAttribute("taskForm", new StudyTask());
+        model.addAttribute("editing", false);
 
         return "planner";
     }
@@ -64,44 +76,94 @@ public class PlannerController {
     public String addTask(
             @Valid @ModelAttribute("taskForm") StudyTask taskForm,
             BindingResult bindingResult,
-            Model model) {
+            Model model,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        Student student = getCurrentStudent(userDetails);
 
         if (bindingResult.hasErrors()) {
-            model.addAttribute(
-                    "tasks",
-                    tasks.stream()
-                            .sorted(Comparator.comparing(StudyTask::getDueDate))
-                            .toList()
-            );
+            addPlannerAttributes(model, student);
+            model.addAttribute("editing", false);
+            return "planner";
+        }
+
+        plannerService.addTask(student.getId(), taskForm);
+
+        return "redirect:/planner";
+    }
+
+    @GetMapping("/{id}/edit")
+    public String editTask(
+            @PathVariable long id,
+            Model model,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        Student student = getCurrentStudent(userDetails);
+
+        StudyTask task = plannerService.getTask(student.getId(), id);
+
+        if (task == null) {
+            return "redirect:/planner";
+        }
+
+        addPlannerAttributes(model, student);
+
+        model.addAttribute("taskForm", task);
+        model.addAttribute("editing", true);
+        model.addAttribute("editingTaskId", id);
+
+        return "planner";
+    }
+
+    @PostMapping("/{id}/edit")
+    public String updateTask(
+            @PathVariable long id,
+            @Valid @ModelAttribute("taskForm") StudyTask taskForm,
+            BindingResult bindingResult,
+            Model model,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        Student student = getCurrentStudent(userDetails);
+
+        if (bindingResult.hasErrors()) {
+            addPlannerAttributes(model, student);
+            model.addAttribute("editing", true);
+            model.addAttribute("editingTaskId", id);
 
             return "planner";
         }
 
-        tasks.add(new StudyTask(
-                ids.getAndIncrement(),
-                taskForm.getTitle(),
-                taskForm.getSubject(),
-                taskForm.getDueDate(),
-                taskForm.getPriority(),
-                false
-        ));
+        boolean updated = plannerService.updateTask(
+                student.getId(), id, taskForm
+        );
+
+        if (!updated) {
+            return "redirect:/planner";
+        }
 
         return "redirect:/planner";
     }
 
     @PostMapping("/{id}/toggle")
-    public String toggleTask(@PathVariable long id) {
-        tasks.stream()
-                .filter(task -> task.getId() == id)
-                .findFirst()
-                .ifPresent(task -> task.setCompleted(!task.isCompleted()));
+    public String toggleTask(
+            @PathVariable long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        Student student = getCurrentStudent(userDetails);
+
+        plannerService.toggleTask(student.getId(), id);
 
         return "redirect:/planner";
     }
 
     @PostMapping("/{id}/delete")
-    public String deleteTask(@PathVariable long id) {
-        tasks.removeIf(task -> task.getId() == id);
+    public String deleteTask(
+            @PathVariable long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        Student student = getCurrentStudent(userDetails);
+
+        plannerService.deleteTask(student.getId(), id);
 
         return "redirect:/planner";
     }

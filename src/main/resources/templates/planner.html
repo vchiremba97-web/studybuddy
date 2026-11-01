@@ -1,16 +1,227 @@
+
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>Study Planner | StudyBuddy</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+
     <link rel="stylesheet" th:href="@{/css/style.css}">
+
+    <style>
+        .profile-menu {
+            position: relative;
+        }
+
+        .profile-trigger {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 13px;
+            border: 1px solid #eadfee;
+            border-radius: 30px;
+            background: white;
+            color: #51465a;
+            cursor: pointer;
+            font: inherit;
+            list-style: none;
+        }
+
+        .profile-trigger::-webkit-details-marker {
+            display: none;
+        }
+
+        .profile-trigger::marker {
+            content: "";
+        }
+
+        .profile-trigger:hover {
+            background: #faf6fc;
+        }
+
+        .profile-avatar {
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #9672b2;
+            color: white;
+            font-weight: bold;
+        }
+
+        .profile-arrow {
+            color: #8963a7;
+            font-size: 12px;
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            z-index: 100;
+            width: 220px;
+            padding: 12px;
+            background: white;
+            border: 1px solid #eee4f1;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(80, 50, 90, 0.13);
+        }
+
+        .profile-email {
+            display: block;
+            padding: 9px 10px 13px;
+            color: #777;
+            font-size: 12px;
+            overflow-wrap: anywhere;
+            border-bottom: 1px solid #eee4f1;
+        }
+
+        .logout-button {
+            width: 100%;
+            margin-top: 9px;
+            padding: 10px;
+            border: none;
+            border-radius: 9px;
+            background: #f8f1fa;
+            color: #805b9e;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .logout-button:hover {
+            background: #efe3f5;
+        }
+
+        .profile-menu[open] .profile-arrow {
+            transform: rotate(180deg);
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+        }
+
+        .planner-form-heading {
+            margin-bottom: 8px;
+        }
+
+        .planner-form-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .planner-form-actions .button {
+            margin-top: 15px;
+        }
+
+        .planner-cancel {
+            display: block;
+            text-align: center;
+            padding: 9px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .edit-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 30px;
+            padding: 5px 10px;
+            border: 1px solid #E7DDF4;
+            border-radius: 8px;
+            background: #F8F4FD;
+            color: #674BB0;
+            font-size: 11px;
+            font-weight: 700;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .edit-button:hover {
+            background: #EDE5FA;
+            color: #674BB0;
+        }
+
+        .task-deadline {
+            display: inline-block;
+            margin-top: 5px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .task-deadline.overdue {
+            color: #C65C6A;
+        }
+
+        .task-deadline.today {
+            color: #C47C50;
+        }
+
+        .task-deadline.tomorrow {
+            color: #8065C8;
+        }
+
+        .task-deadline.upcoming {
+            color: #548B69;
+        }
+
+        .task-deadline.completed {
+            color: #75A995;
+        }
+
+        .task-info {
+            min-width: 0;
+            overflow-wrap: anywhere;
+        }
+
+        .task-info strong {
+            overflow-wrap: anywhere;
+        }
+
+        .task-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .task-actions form {
+            margin: 0;
+        }
+
+        @media (max-width: 600px) {
+            .task-actions {
+                gap: 5px;
+            }
+
+            .edit-button {
+                padding: 5px 7px;
+                font-size: 10px;
+            }
+        }
+    </style>
 </head>
+
 <body>
+
 <div class="app-layout">
 
-    <!-- Sidebar -->
     <aside class="sidebar">
+
         <a class="brand" th:href="@{/dashboard}">
             StudyBuddy<span>.</span>
         </a>
@@ -18,6 +229,7 @@
         <div class="nav-label">WORKSPACE</div>
 
         <nav>
+
             <a class="nav-link" th:href="@{/dashboard}">
                 <span class="nav-icon">⌂</span>
                 Dashboard
@@ -33,118 +245,224 @@
                 Assignments
             </a>
 
+            <a class="nav-link" th:href="@{/calendar}">
+                <span class="nav-icon">▦</span>
+                Academic calendar
+            </a>
+
             <a class="nav-link active" th:href="@{/planner}">
                 <span class="nav-icon">◷</span>
                 Study planner
+            </a>
+
+            <a class="nav-link" th:href="@{/timer}">
+                <span class="nav-icon">◷</span>
+                Study Timer
             </a>
 
             <a class="nav-link" th:href="@{/progress}">
                 <span class="nav-icon">↗</span>
                 My progress
             </a>
+
         </nav>
 
         <div class="sidebar-bottom">
             Your goals, your pace.<br>
             A little progress every day.
         </div>
+
     </aside>
 
-    <!-- Main area -->
     <div class="main-area">
 
         <header class="topbar">
+
             <div>
-                <div class="page-label">YOUR PERSONAL STUDY SPACE</div>
-                <div class="topbar-title">Study planner</div>
+                <div class="page-label">
+                    YOUR PERSONAL STUDY SPACE
+                </div>
+
+                <div class="topbar-title">
+                    Study planner
+                </div>
             </div>
 
-            <div class="profile-chip">
-                <div class="avatar">S</div>
-                <span>Student</span>
-            </div>
+            <details class="profile-menu">
+
+                <summary class="profile-trigger">
+
+                    <span class="profile-avatar"
+                          th:text="${#strings.substring(#authentication.name, 0, 1).toUpperCase()}">
+                        S
+                    </span>
+
+                    <span>My account</span>
+
+                    <span class="profile-arrow">▼</span>
+
+                </summary>
+
+                <div class="profile-dropdown">
+
+                    <span class="profile-email"
+                          sec:authentication="name">
+                        student@email.com
+                    </span>
+
+                    <form th:action="@{/logout}" method="post">
+
+                        <input type="hidden"
+                               th:name="${_csrf.parameterName}"
+                               th:value="${_csrf.token}">
+
+                        <button type="submit" class="logout-button">
+                            Log out
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </details>
+
         </header>
 
         <main class="page-content">
 
-            <!-- Welcome section -->
             <section class="welcome-row">
+
                 <div>
-                    <h1>Plan your study time <span> </span></h1>
+
+                    <h1>
+                        Plan your study time <span></span>
+                    </h1>
+
                     <p class="muted">
-                        Turn your workload into manageable tasks, organise
-                        deadlines and make steady progress toward your goals.
+                        Turn your workload into manageable tasks,
+                        organise deadlines and make steady progress
+                        toward your goals.
                     </p>
+
                 </div>
 
                 <a class="button" href="#add-task">
                     + Add a task
                 </a>
+
             </section>
 
-            <!-- Task summary -->
             <section class="stats-grid">
 
                 <article class="stat-card">
+
                     <div class="stat-top">
                         <span>Total tasks</span>
                         <span class="stat-icon">☷</span>
                     </div>
+
                     <div class="stat-number"
-                         th:text="${tasks.size()}">0</div>
-                    <div class="stat-note">Tasks in your planner</div>
+                         th:text="${tasks.size()}">
+                        0
+                    </div>
+
+                    <div class="stat-note">
+                        Tasks in your planner
+                    </div>
+
                 </article>
 
                 <article class="stat-card">
+
                     <div class="stat-top">
                         <span>Completed</span>
                         <span class="stat-icon">✓</span>
                     </div>
+
                     <div class="stat-number"
-                         th:text="${#lists.size(tasks.?[completed])}">0</div>
-                    <div class="stat-note">Tasks you have finished</div>
+                         th:text="${#lists.size(tasks.?[completed])}">
+                        0
+                    </div>
+
+                    <div class="stat-note">
+                        Tasks you have finished
+                    </div>
+
                 </article>
 
                 <article class="stat-card">
+
                     <div class="stat-top">
                         <span>Still to do</span>
                         <span class="stat-icon">◷</span>
                     </div>
+
                     <div class="stat-number"
-                         th:text="${#lists.size(tasks.?[!completed])}">0</div>
-                    <div class="stat-note">Tasks waiting for you</div>
+                         th:text="${#lists.size(tasks.?[!completed])}">
+                        0
+                    </div>
+
+                    <div class="stat-note">
+                        Tasks waiting for you
+                    </div>
+
                 </article>
 
                 <article class="stat-card">
+
                     <div class="stat-top">
                         <span>Completion</span>
                         <span class="stat-icon">↗</span>
                     </div>
+
                     <div class="stat-number"
-                         th:text="${tasks.isEmpty() ? 0 : (100 * #lists.size(tasks.?[completed]) / tasks.size()) + '%'}">0%</div>
-                    <div class="stat-note">Of your planner tasks</div>
+                         th:text="${tasks.isEmpty() ? 0 : (100 * #lists.size(tasks.?[completed]) / tasks.size()) + '%'}">
+                        0%
+                    </div>
+
+                    <div class="stat-note">
+                        Of your planner tasks
+                    </div>
+
                 </article>
 
             </section>
 
-            <!-- Planner content -->
             <section class="content-grid">
 
-                <!-- Add task form -->
                 <div class="panel" id="add-task">
-                    <div class="panel-heading">
-                        <h2>Add a task</h2>
+
+                    <div class="panel-heading planner-form-heading">
+
+                        <h2 th:text="${editing} ? 'Edit task' : 'Add a task'">
+                            Add a task
+                        </h2>
+
                     </div>
 
-                    <p class="muted">
+                    <p class="muted"
+                       th:text="${editing} ?
+                       'Update the details of your selected task.' :
+                       'What would you like to work on?'">
+
                         What would you like to work on?
+
                     </p>
 
-                    <form th:action="@{/planner}"
+                    <form th:action="${editing} ?
+                                  @{/planner/{id}/edit(id=${editingTaskId})} :
+                                  @{/planner}"
                           th:object="${taskForm}"
                           method="post">
 
-                        <label for="title">Task title</label>
+                        <input type="hidden"
+                               th:name="${_csrf.parameterName}"
+                               th:value="${_csrf.token}">
+
+                        <label for="title">
+                            Task title
+                        </label>
+
                         <input id="title"
                                type="text"
                                th:field="*{title}"
@@ -153,9 +471,13 @@
 
                         <small class="error"
                                th:if="${#fields.hasErrors('title')}"
-                               th:errors="*{title}"></small>
+                               th:errors="*{title}">
+                        </small>
 
-                        <label for="subject">Subject</label>
+                        <label for="subject">
+                            Subject
+                        </label>
+
                         <input id="subject"
                                type="text"
                                th:field="*{subject}"
@@ -164,9 +486,13 @@
 
                         <small class="error"
                                th:if="${#fields.hasErrors('subject')}"
-                               th:errors="*{subject}"></small>
+                               th:errors="*{subject}">
+                        </small>
 
-                        <label for="dueDate">Due date</label>
+                        <label for="dueDate">
+                            Due date
+                        </label>
+
                         <input id="dueDate"
                                type="date"
                                th:field="*{dueDate}"
@@ -174,56 +500,109 @@
 
                         <small class="error"
                                th:if="${#fields.hasErrors('dueDate')}"
-                               th:errors="*{dueDate}"></small>
+                               th:errors="*{dueDate}">
+                        </small>
 
-                        <label for="priority">Priority</label>
-                        <select id="priority" th:field="*{priority}">
-                            <option value="Low">Low</option>
-                            <option value="Medium">Medium</option>
-                            <option value="High">High</option>
+                        <label for="priority">
+                            Priority
+                        </label>
+
+                        <select id="priority"
+                                th:field="*{priority}">
+
+                            <option value="Low">
+                                Low
+                            </option>
+
+                            <option value="Medium">
+                                Medium
+                            </option>
+
+                            <option value="High">
+                                High
+                            </option>
+
                         </select>
 
-                        <button class="button full-width" type="submit">
-                            Add to planner ＋
-                        </button>
+                        <small class="error"
+                               th:if="${#fields.hasErrors('priority')}"
+                               th:errors="*{priority}">
+                        </small>
+
+                        <div class="planner-form-actions">
+
+                            <button class="button full-width"
+                                    type="submit">
+
+                                <span th:text="${editing} ?
+                                      'Save changes ✓' :
+                                      'Add to planner ＋'">
+                                    Add to planner ＋
+                                </span>
+
+                            </button>
+
+                            <a th:if="${editing}"
+                               th:href="@{/planner}"
+                               class="planner-cancel">
+
+                                Cancel editing
+
+                            </a>
+
+                        </div>
+
                     </form>
 
                     <div class="notice">
+
                         <strong>Stay organised</strong>
+
                         <p>
-                            Choose a realistic deadline and priority for
-                            each task. Focus on one step at a time.
+                            Choose a realistic deadline and priority
+                            for each task. Focus on one step at a time.
                         </p>
+
                     </div>
+
                 </div>
 
-                <!-- Task list -->
                 <div class="panel">
+
                     <div class="panel-heading">
+
                         <h2>Your tasks</h2>
+
                         <span class="count"
-                              th:text="${tasks.size()} + ' tasks'">0 tasks</span>
+                              th:text="${tasks.size()} + ' tasks'">
+                            0 tasks
+                        </span>
+
                     </div>
 
                     <p class="muted">
                         A clear view of what you need to do next.
                     </p>
 
-                    <!-- Empty state -->
                     <div class="empty-state"
                          th:if="${#lists.isEmpty(tasks)}">
+
                         <div class="empty-icon">✧</div>
+
                         <h3>Your list starts here</h3>
+
                         <p>
-                            Add a task using the form to start organising
-                            your study workload.
+                            Add a task using the form to start
+                            organising your study workload.
                         </p>
-                        <a class="button button-secondary" href="#add-task">
+
+                        <a class="button button-secondary"
+                           href="#add-task">
                             Create your first task
                         </a>
+
                     </div>
 
-                    <!-- Task list -->
                     <div class="task-list"
                          th:unless="${#lists.isEmpty(tasks)}">
 
@@ -233,57 +612,139 @@
 
                             <form th:action="@{/planner/{id}/toggle(id=${task.id})}"
                                   method="post">
+
+                                <input type="hidden"
+                                       th:name="${_csrf.parameterName}"
+                                       th:value="${_csrf.token}">
+
                                 <button class="round-check"
                                         type="submit"
-                                        th:aria-label="${task.completed} ? 'Mark incomplete' : 'Mark complete'"
+                                        th:aria-label="${task.completed} ?
+                                        'Mark incomplete' :
+                                        'Mark complete'"
                                         th:text="${task.completed} ? '✓' : ''">
                                 </button>
+
                             </form>
 
                             <div class="task-info">
+
                                 <strong th:text="${task.title}">
                                     Task title
                                 </strong>
 
                                 <small>
-                                    <span th:text="${task.subject}">Subject</span>
+
+                                    <span th:text="${task.subject}">
+                                        Subject
+                                    </span>
+
                                     <span> · Due </span>
+
                                     <span th:text="${#temporals.format(task.dueDate, 'd MMM yyyy')}">
                                         Date
                                     </span>
+
                                 </small>
+
+                                <span class="task-deadline completed"
+                                      th:if="${task.completed}">
+
+                                    Completed
+
+                                </span>
+
+                                <span class="task-deadline overdue"
+                                      th:if="${!task.completed and task.dueDate.isBefore(today)}">
+
+                                    Overdue
+
+                                </span>
+
+                                <span class="task-deadline today"
+                                      th:if="${!task.completed and task.dueDate.isEqual(today)}">
+
+                                    Due today
+
+                                </span>
+
+                                <span class="task-deadline tomorrow"
+                                      th:if="${!task.completed and task.dueDate.isEqual(tomorrow)}">
+
+                                    Due tomorrow
+
+                                </span>
+
+                                <span class="task-deadline upcoming"
+                                      th:if="${!task.completed and task.dueDate.isAfter(tomorrow)}">
+
+                                    Upcoming
+
+                                </span>
+
                             </div>
 
-                            <span class="priority"
-                                  th:classappend="${#strings.toLowerCase(task.priority)}"
-                                  th:text="${task.priority}">
-                                Medium
-                            </span>
+                            <div class="task-actions">
 
-                            <form th:action="@{/planner/{id}/delete(id=${task.id})}"
-                                  method="post">
-                                <button class="delete-button"
-                                        type="submit"
-                                        aria-label="Delete task"
-                                        title="Delete task">
-                                    ×
-                                </button>
-                            </form>
+                                <span class="priority"
+                                      th:classappend="${#strings.toLowerCase(task.priority)}"
+                                      th:text="${task.priority}">
+
+                                    Medium
+
+                                </span>
+
+                                <a class="edit-button"
+                                   th:href="@{/planner/{id}/edit(id=${task.id})}">
+
+                                    Edit
+
+                                </a>
+
+                                <form th:action="@{/planner/{id}/delete(id=${task.id})}"
+                                      method="post">
+
+                                    <input type="hidden"
+                                           th:name="${_csrf.parameterName}"
+                                           th:value="${_csrf.token}">
+
+                                    <button class="delete-button"
+                                            type="submit"
+                                            aria-label="Delete task"
+                                            title="Delete task">
+
+                                        ×
+
+                                    </button>
+
+                                </form>
+
+                            </div>
 
                         </article>
+
                     </div>
 
                     <div class="progress-note">
+
                         <span class="progress-sparkle">✦</span>
+
                         <span>
-                            Small steps build strong study habits. Keep going!
+                            Small steps build strong study habits.
+                            Keep going!
                         </span>
+
                     </div>
+
                 </div>
 
             </section>
+
         </main>
+
     </div>
+
 </div>
+
 </body>
 </html>
