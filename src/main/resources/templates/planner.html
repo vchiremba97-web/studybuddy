@@ -1,15 +1,114 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Study Planner | StudyBuddy</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+
+    <style>
+        .profile-menu {
+            position: relative;
+        }
+
+        .profile-trigger {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 13px;
+            border: 1px solid #eadfee;
+            border-radius: 30px;
+            background: white;
+            color: #51465a;
+            cursor: pointer;
+            font: inherit;
+            list-style: none;
+        }
+
+        .profile-trigger::-webkit-details-marker {
+            display: none;
+        }
+
+        .profile-trigger::marker {
+            content: "";
+        }
+
+        .profile-trigger:hover {
+            background: #faf6fc;
+        }
+
+        .profile-avatar {
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #9672b2;
+            color: white;
+            font-weight: bold;
+        }
+
+        .profile-arrow {
+            color: #8963a7;
+            font-size: 12px;
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            z-index: 100;
+            width: 220px;
+            padding: 12px;
+            background: white;
+            border: 1px solid #eee4f1;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(80, 50, 90, 0.13);
+        }
+
+        .profile-email {
+            display: block;
+            padding: 9px 10px 13px;
+            color: #777;
+            font-size: 12px;
+            overflow-wrap: anywhere;
+            border-bottom: 1px solid #eee4f1;
+        }
+
+        .logout-button {
+            width: 100%;
+            margin-top: 9px;
+            padding: 10px;
+            border: none;
+            border-radius: 9px;
+            background: #f8f1fa;
+            color: #805b9e;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .logout-button:hover {
+            background: #efe3f5;
+        }
+
+        .profile-menu[open] .profile-arrow {
+            transform: rotate(180deg);
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+        }
+    </style>
 </head>
+
 <body>
 <div class="app-layout">
 
-    <!-- Sidebar -->
     <aside class="sidebar">
         <a class="brand" th:href="@{/dashboard}">
             StudyBuddy<span>.</span>
@@ -33,6 +132,11 @@
                 Assignments
             </a>
 
+            <a class="nav-link" th:href="@{/calendar}">
+                <span class="nav-icon">▦</span>
+                Academic calendar
+            </a>
+
             <a class="nav-link active" th:href="@{/planner}">
                 <span class="nav-icon">◷</span>
                 Study planner
@@ -50,7 +154,6 @@
         </div>
     </aside>
 
-    <!-- Main area -->
     <div class="main-area">
 
         <header class="topbar">
@@ -59,18 +162,36 @@
                 <div class="topbar-title">Study planner</div>
             </div>
 
-            <div class="profile-chip">
-                <div class="avatar">S</div>
-                <span>Student</span>
-            </div>
+            <details class="profile-menu">
+                <summary class="profile-trigger">
+                    <span class="profile-avatar"
+                          th:text="${#strings.substring(#authentication.name, 0, 1).toUpperCase()}">S</span>
+                    <span>My account</span>
+                    <span class="profile-arrow">▼</span>
+                </summary>
+
+                <div class="profile-dropdown">
+                    <span class="profile-email"
+                          sec:authentication="name">student@email.com</span>
+
+                    <form th:action="@{/logout}" method="post">
+                        <input type="hidden"
+                               th:name="${_csrf.parameterName}"
+                               th:value="${_csrf.token}">
+
+                        <button type="submit" class="logout-button">
+                            Log out
+                        </button>
+                    </form>
+                </div>
+            </details>
         </header>
 
         <main class="page-content">
 
-            <!-- Welcome section -->
             <section class="welcome-row">
                 <div>
-                    <h1>Plan your study time <span> </span></h1>
+                    <h1>Plan your study time <span></span></h1>
                     <p class="muted">
                         Turn your workload into manageable tasks, organise
                         deadlines and make steady progress toward your goals.
@@ -82,7 +203,6 @@
                 </a>
             </section>
 
-            <!-- Task summary -->
             <section class="stats-grid">
 
                 <article class="stat-card">
@@ -127,10 +247,8 @@
 
             </section>
 
-            <!-- Planner content -->
             <section class="content-grid">
 
-                <!-- Add task form -->
                 <div class="panel" id="add-task">
                     <div class="panel-heading">
                         <h2>Add a task</h2>
@@ -197,7 +315,6 @@
                     </div>
                 </div>
 
-                <!-- Task list -->
                 <div class="panel">
                     <div class="panel-heading">
                         <h2>Your tasks</h2>
@@ -209,7 +326,6 @@
                         A clear view of what you need to do next.
                     </p>
 
-                    <!-- Empty state -->
                     <div class="empty-state"
                          th:if="${#lists.isEmpty(tasks)}">
                         <div class="empty-icon">✧</div>
@@ -223,7 +339,6 @@
                         </a>
                     </div>
 
-                    <!-- Task list -->
                     <div class="task-list"
                          th:unless="${#lists.isEmpty(tasks)}">
 

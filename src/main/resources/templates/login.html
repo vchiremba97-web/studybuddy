@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | StudyBuddy</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+
+  <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body.login-page {
+            min-height: 100vh;
+            margin: 0;
+            padding: 30px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background:
+                radial-gradient(circle at 10% 15%, #f0e4f6, transparent 35%),
+                radial-gradient(circle at 90% 85%, #f8e5ed, transparent 35%),
+                #faf7fb;
+            font-family: Arial, sans-serif;
+        }
+
+        .login-wrapper {
+            width: 100%;
+            max-width: 950px;
+            min-height: 560px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            overflow: hidden;
+            background: #fff;
+            border: 1px solid #eee5f2;
+            border-radius: 25px;
+            box-shadow: 0 18px 55px rgba(69, 43, 83, 0.10);
+        }
+
+        .login-welcome {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 55px 45px;
+            overflow: hidden;
+            background: linear-gradient(145deg, #a88bc0, #80639c);
+            color: white;
+        }
+
+        .login-welcome::before,
+        .login-welcome::after {
+            content: "";
+            position: absolute;
+            border: 1px solid rgba(255,255,255,0.17);
+            border-radius: 50%;
+        }
+
+        .login-welcome::before {
+            width: 300px;
+            height: 300px;
+            right: -120px;
+            top: 80px;
+        }
+
+        .login-welcome::after {
+            width: 220px;
+            height: 220px;
+            right: -65px;
+            top: 120px;
+        }
+
+        .welcome-content,
+        .welcome-footer,
+        .welcome-brand {
+            position: relative;
+            z-index: 1;
+        }
+
+        .welcome-brand {
+            font-size: 25px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .welcome-brand span {
+            color: #f8dce9;
+        }
+
+        .welcome-content {
+            max-width: 350px;
+        }
+
+        .welcome-content .eyebrow {
+            margin-bottom: 18px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #f3eaf8;
+        }
+
+        .welcome-content h1 {
+            margin: 0 0 18px;
+            font-size: clamp(30px, 4vw, 42px);
+            line-height: 1.2;
+            font-weight: 700;
+        }
+
+        .welcome-content p {
+            color: rgba(255,255,255,0.85);
+            line-height: 1.8;
+            font-size: 14px;
+        }
+
+        .welcome-footer {
+            font-size: 12px;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .login-form-panel {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 55px 45px;
+        }
+
+        .login-form-content {
+            width: 100%;
+            max-width: 360px;
+        }
+
+        .login-form-content h2 {
+            margin: 0 0 10px;
+            color: #382b45;
+            font-size: 28px;
+        }
+
+        .login-description {
+            margin: 0 0 30px;
+            color: #8b8291;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .login-message {
+            padding: 13px 15px;
+            margin-bottom: 18px;
+            border-radius: 9px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .login-error {
+            background: #fff0f0;
+            color: #a33e4b;
+            border: 1px solid #f5d6d9;
+        }
+
+        .login-success {
+            background: #edf8f0;
+            color: #36764b;
+            border: 1px solid #d7eddd;
+        }
+
+        .login-form .form-group {
+            margin-bottom: 20px;
+        }
+
+        .login-form label {
+            display: block;
+            margin-bottom: 9px;
+            color: #51465b;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .login-form input {
+            display: block;
+            width: 100%;
+            height: 48px;
+            padding: 0 14px;
+            border: 1px solid #e6ddea;
+            border-radius: 10px;
+            background: #fff;
+            color: #382b45;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .login-form input:focus {
+            border-color: #a88bc0;
+            box-shadow: 0 0 0 3px rgba(168,139,192,0.13);
+        }
+
+        .login-form input::placeholder {
+            color: #b6adbb;
+        }
+
+        .login-button {
+            width: 100%;
+            height: 49px;
+            margin-top: 8px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(100deg, #a88bc0, #896ba6);
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 18px rgba(137,107,166,0.25);
+        }
+
+        .login-bottom {
+            margin-top: 25px;
+            text-align: center;
+            color: #8b8291;
+            font-size: 13px;
+        }
+
+        .login-bottom a {
+            color: #896ba6;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .login-bottom a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 700px) {
+            .login-wrapper {
+                max-width: 460px;
+                grid-template-columns: 1fr;
+            }
+
+            .login-welcome {
+                min-height: 210px;
+                padding: 28px;
+            }
+
+            .welcome-content {
+                margin-top: 35px;
+            }
+
+            .welcome-content h1 {
+                font-size: 29px;
+            }
+
+            .welcome-content p {
+                margin-bottom: 0;
+            }
+
+            .welcome-footer {
+                display: none;
+            }
+
+            .login-form-panel {
+                padding: 38px 28px;
+            }
+        }
+    </style>
+</head>
+
+<body class="login-page">
+
+<div class="login-wrapper">
+
+  <section class="login-welcome">
+
+    <div class="welcome-brand">
+      StudyBuddy<span>.</span>
+    </div>
+
+    <div class="welcome-content">
+      <div class="eyebrow">YOUR PERSONAL STUDY SPACE</div>
+
+      <h1>Make every study session count.</h1>
+
+      <p>
+        Organise your classes, manage deadlines and build
+        better study habits, all in one place.
+      </p>
+    </div>
+
+    <div class="welcome-footer">
+      Your goals, your pace. A little progress every day.
+    </div>
+
+  </section>
+
+  <section class="login-form-panel">
+
+    <div class="login-form-content">
+
+      <h2>Welcome back</h2>
+
+      <p class="login-description">
+        Sign in to continue your learning journey.
+      </p>
+
+      <div th:if="${param.error}"
+           class="login-message login-error">
+        Incorrect email or password. Please try again.
+      </div>
+
+      <div th:if="${param.logout}"
+           class="login-message login-success">
+        You have successfully logged out.
+      </div>
+
+      <div th:if="${successMessage}"
+           class="login-message login-success"
+           th:text="${successMessage}">
+      </div>
+
+      <form th:action="@{/login}"
+            method="post"
+            class="login-form">
+
+        <div class="form-group">
+          <label for="email">Email address</label>
+
+          <input type="email"
+                 id="email"
+                 name="email"
+                 placeholder="Enter your email address"
+                 autocomplete="email"
+                 required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+
+          <input type="password"
+                 id="password"
+                 name="password"
+                 placeholder="Enter your password"
+                 autocomplete="current-password"
+                 required>
+        </div>
+
+        <button type="submit" class="login-button">
+          Sign in to StudyBuddy
+        </button>
+
+      </form>
+
+      <p class="login-bottom">
+        Don't have an account?
+        <a th:href="@{/register}">Create one</a>
+      </p>
+
+    </div>
+
+  </section>
+
+</div>
+
+</body>
+</html>

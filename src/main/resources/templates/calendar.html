@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Academic Calendar | StudyBuddy</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+<div class="app-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <a class="brand" th:href="@{/dashboard}">
+      StudyBuddy<span>.</span>
+    </a>
+
+    <div class="nav-label">WORKSPACE</div>
+
+    <nav>
+      <a class="nav-link" th:href="@{/dashboard}">
+        <span class="nav-icon">⌂</span>
+        Dashboard
+      </a>
+
+      <a class="nav-link" th:href="@{/courses}">
+        <span class="nav-icon">▦</span>
+        My courses
+      </a>
+
+      <a class="nav-link" th:href="@{/assignments}">
+        <span class="nav-icon">☷</span>
+        Assignments
+      </a>
+
+      <a class="nav-link active" th:href="@{/calendar}">
+        <span class="nav-icon">▦</span>
+        Academic calendar
+      </a>
+
+      <a class="nav-link" th:href="@{/planner}">
+        <span class="nav-icon">◷</span>
+        Study planner
+      </a>
+
+      <a class="nav-link" th:href="@{/progress}">
+        <span class="nav-icon">↗</span>
+        My progress
+      </a>
+    </nav>
+
+    <div class="sidebar-bottom">
+      Your goals, your pace.<br>
+      A little progress every day.
+    </div>
+  </aside>
+
+  <!-- Main area -->
+  <div class="main-area">
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <div>
+        <div class="page-label">YOUR PERSONAL STUDY SPACE</div>
+        <div class="topbar-title">Academic Calendar</div>
+      </div>
+
+      <!-- Profile dropdown -->
+      <div class="profile-menu">
+
+        <button type="button"
+                class="profile-chip"
+                onclick="toggleProfileMenu()">
+
+          <div class="avatar"
+               th:text="${studentName != null and !#strings.isEmpty(studentName)
+                         ? #strings.substring(studentName, 0, 1).toUpperCase() : 'S'}">
+            S
+          </div>
+
+          <span th:text="${studentName != null ? studentName : 'Student'}">
+                        Student
+                    </span>
+
+          <span class="dropdown-arrow">⌄</span>
+        </button>
+
+        <div class="profile-dropdown" id="profileDropdown">
+
+          <div class="dropdown-user">
+            <strong th:text="${studentName != null ? studentName : 'Student'}">
+              Student
+            </strong>
+            <small>My StudyBuddy account</small>
+          </div>
+
+          <div class="dropdown-divider"></div>
+
+          <a th:href="@{/dashboard}" class="dropdown-item">
+            <span>⌂</span> Dashboard
+          </a>
+
+          <div class="dropdown-divider"></div>
+
+          <form th:action="@{/logout}" method="post">
+            <button type="submit"
+                    class="dropdown-item logout-item">
+              <span>↪</span> Log out
+            </button>
+          </form>
+
+        </div>
+      </div>
+    </header>
+
+    <main class="page-content">
+
+      <!-- Page introduction -->
+      <section class="welcome-row calendar-welcome">
+        <div>
+          <h1>Plan your academic life</h1>
+          <p class="muted">
+            Keep track of lectures, exams, assignments
+            and important study dates.
+          </p>
+        </div>
+
+        <a href="#add-calendar-event" class="button">
+          + Add an event
+        </a>
+      </section>
+
+      <!-- Calendar -->
+      <section class="panel academic-calendar-panel">
+
+        <div class="calendar-toolbar">
+
+          <div>
+            <h2 th:text="${monthTitle}">November 2026</h2>
+            <p class="muted">
+              Your monthly academic schedule
+            </p>
+          </div>
+
+          <div class="calendar-navigation">
+
+            <a class="calendar-nav-button"
+               th:href="@{/calendar(month=${previousMonth})}"
+               aria-label="Previous month">
+              ‹
+            </a>
+
+            <a class="calendar-today-button"
+               th:href="@{/calendar}">
+              Current month
+            </a>
+
+            <a class="calendar-nav-button"
+               th:href="@{/calendar(month=${nextMonth})}"
+               aria-label="Next month">
+              ›
+            </a>
+
+          </div>
+        </div>
+
+        <!-- Event category legend -->
+        <div class="calendar-legend">
+                    <span>
+                        <i class="legend-dot assignment-dot"></i>
+                        Assignments
+                    </span>
+
+          <span>
+                        <i class="legend-dot exam-dot"></i>
+                        Exams
+                    </span>
+
+          <span>
+                        <i class="legend-dot lecture-dot"></i>
+                        Lectures
+                    </span>
+
+          <span>
+                        <i class="legend-dot study-dot"></i>
+                        Study sessions
+                    </span>
+
+          <span>
+                        <i class="legend-dot personal-dot"></i>
+                        Personal
+                    </span>
+        </div>
+
+        <!-- Weekday headings -->
+        <div class="calendar-grid">
+
+          <div class="calendar-weekday">Monday</div>
+          <div class="calendar-weekday">Tuesday</div>
+          <div class="calendar-weekday">Wednesday</div>
+          <div class="calendar-weekday">Thursday</div>
+          <div class="calendar-weekday">Friday</div>
+          <div class="calendar-weekday">Saturday</div>
+          <div class="calendar-weekday">Sunday</div>
+
+          <!-- Calendar dates -->
+          <div class="calendar-day"
+               th:each="day : ${calendarDays}"
+               th:classappend="${day.monthValue !=
+                         T(java.time.YearMonth).parse(selectedMonth).monthValue
+                         ? ' other-month' : ''}
+                         + ${day.equals(today) ? ' today' : ''}">
+
+            <div class="calendar-day-number"
+                 th:text="${day.dayOfMonth}">
+              1
+            </div>
+
+            <!-- Events on this date -->
+            <div class="calendar-day-events"
+                 th:if="${eventsByDate[day] != null}">
+
+              <div class="calendar-event"
+                   th:each="event : ${eventsByDate[day]}"
+                   th:classappend="${#strings.toLowerCase(event.eventType)}">
+
+                                <span class="calendar-event-time"
+                                      th:if="${event.startTime != null}"
+                                      th:text="${#temporals.format(event.startTime, 'HH:mm')}">
+                                    09:00
+                                </span>
+
+                <span th:text="${event.title}">
+                                    Event title
+                                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Add event form -->
+      <section class="panel calendar-form-panel"
+               id="add-calendar-event">
+
+        <div class="panel-heading">
+          <h2>Add a calendar event</h2>
+        </div>
+
+        <p class="muted">
+          Add an important date to your personal academic calendar.
+        </p>
+
+        <form th:action="@{/calendar/events/add}"
+              method="post"
+              class="calendar-event-form">
+
+          <div class="calendar-form-grid">
+
+            <div class="form-group">
+              <label for="title">Event title *</label>
+              <input type="text"
+                     id="title"
+                     name="title"
+                     placeholder="e.g. Mathematics lecture"
+                     required>
+            </div>
+
+            <div class="form-group">
+              <label for="eventType">Event category *</label>
+              <select id="eventType"
+                      name="eventType"
+                      required>
+                <option value="ASSIGNMENT">Assignment</option>
+                <option value="EXAM">Exam</option>
+                <option value="LECTURE">Lecture</option>
+                <option value="STUDY">Study session</option>
+                <option value="PERSONAL">Personal</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="eventDate">Event date *</label>
+              <input type="date"
+                     id="eventDate"
+                     name="eventDate"
+                     th:value="${today}"
+                     required>
+            </div>
+
+            <div class="form-group">
+              <label for="startTime">Start time</label>
+              <input type="time"
+                     id="startTime"
+                     name="startTime">
+            </div>
+
+            <div class="form-group">
+              <label for="endTime">End time</label>
+              <input type="time"
+                     id="endTime"
+                     name="endTime">
+            </div>
+
+            <div class="form-group calendar-description-field">
+              <label for="description">Description</label>
+              <textarea id="description"
+                        name="description"
+                        rows="3"
+                        placeholder="Add any extra details about this event..."></textarea>
+            </div>
+
+          </div>
+
+          <button type="submit" class="button">
+            Save calendar event
+          </button>
+
+        </form>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script th:src="@{/js/profile.js}"></script>
+
+</body>
+</html>

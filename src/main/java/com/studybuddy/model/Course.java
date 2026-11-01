@@ -1,13 +1,28 @@
-
 package com.studybuddy.model;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "courses")
 public class Course {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private String name;
+
     private String code;
+
     private String instructor;
+
+    @Column(length = 2000)
     private String description;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "student_id", nullable = false)
+    private Student student;
 
     public Course() {
     }
@@ -59,5 +74,13 @@ public class Course {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Student getStudent() {
+        return student;
+    }
+
+    public void setStudent(Student student) {
+        this.student = student;
     }
 }

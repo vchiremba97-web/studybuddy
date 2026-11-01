@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account | StudyBuddy</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f3fa;
+            font-family: Arial, sans-serif;
+            padding: 25px 0;
+            box-sizing: border-box;
+        }
+
+        .auth-card {
+            width: 90%;
+            max-width: 470px;
+            padding: 38px;
+            background: white;
+            border-radius: 22px;
+            box-shadow: 0 10px 35px rgba(80, 50, 90, 0.10);
+            box-sizing: border-box;
+        }
+
+        .brand {
+            text-align: center;
+            color: #8b65a8;
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #777;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        label {
+            display: block;
+            margin: 16px 0 7px;
+            color: #51465a;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #e2d8e8;
+            border-radius: 10px;
+            box-sizing: border-box;
+            font-size: 15px;
+            background: white;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus, select:focus {
+            border-color: #9672b2;
+            box-shadow: 0 0 0 3px rgba(150, 114, 178, 0.12);
+        }
+
+        .register-button {
+            width: 100%;
+            margin-top: 25px;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            background: #9672b2;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .register-button:hover {
+            background: #805b9e;
+            transform: translateY(-1px);
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .error {
+            background: #ffe9e9;
+            color: #a33;
+        }
+
+        .bottom-text {
+            text-align: center;
+            margin-top: 22px;
+            color: #777;
+            font-size: 14px;
+        }
+
+        a {
+            color: #8963a7;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 500px) {
+            .auth-card {
+                padding: 28px 22px;
+            }
+
+            .brand {
+                font-size: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="auth-card">
+
+    <div class="brand">StudyBuddy</div>
+    <p class="subtitle">Create your account and organise your studies.</p>
+
+    <div th:if="${errorMessage}"
+         class="message error"
+         th:text="${errorMessage}"
+         role="alert"></div>
+
+    <form th:action="@{/register}" method="post">
+
+        <input type="hidden"
+               th:name="${_csrf.parameterName}"
+               th:value="${_csrf.token}">
+
+        <label for="fullName">Full name</label>
+        <input type="text"
+               id="fullName"
+               name="fullName"
+               placeholder="Enter your full name"
+               th:value="${fullName}"
+               autocomplete="name"
+               maxlength="100"
+               required>
+
+        <label for="email">Email address</label>
+        <input type="email"
+               id="email"
+               name="email"
+               placeholder="Enter your email"
+               th:value="${email}"
+               autocomplete="email"
+               maxlength="150"
+               required>
+
+        <label for="password">Password</label>
+        <input type="password"
+               id="password"
+               name="password"
+               placeholder="At least 8 characters"
+               minlength="8"
+               autocomplete="new-password"
+               required>
+
+        <label for="educationLevel">Education level</label>
+        <select id="educationLevel"
+                name="educationLevel"
+                required>
+
+            <option value="">Select your education level</option>
+
+            <option value="HIGH_SCHOOL"
+                    th:selected="${educationLevel == 'HIGH_SCHOOL'}">
+                High School
+            </option>
+
+            <option value="UNIVERSITY"
+                    th:selected="${educationLevel == 'UNIVERSITY'}">
+                University
+            </option>
+
+        </select>
+
+        <label for="institutionName">School / University name</label>
+        <input type="text"
+               id="institutionName"
+               name="institutionName"
+               placeholder="Enter your institution"
+               th:value="${institutionName}"
+               maxlength="150"
+               required>
+
+        <button type="submit" class="register-button">
+            Create Account
+        </button>
+
+    </form>
+
+    <p class="bottom-text">
+        Already have an account?
+        <a th:href="@{/login}">Log in</a>
+    </p>
+
+</div>
+
+</body>
+</html>

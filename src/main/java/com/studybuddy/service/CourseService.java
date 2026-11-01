@@ -2,48 +2,63 @@
 package com.studybuddy.service;
 
 import com.studybuddy.model.Course;
+import com.studybuddy.model.Student;
+import com.studybuddy.repository.CourseRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class CourseService {
 
-    private final List<Course> courses = new ArrayList<>();
-    private final AtomicLong nextId = new AtomicLong(1);
+    private final CourseRepository courseRepository;
 
-    public synchronized List<Course> getAllCourses() {
-        return new ArrayList<>(courses);
+    public CourseService(CourseRepository courseRepository) {
+        this.courseRepository = courseRepository;
     }
 
-    public synchronized void addCourse(
+    public List<Course> getAllCourses(Student student) {
+        if (student == null || student.getId() == null) {
+            return List.of();
+        }
+
+        return courseRepository.findAllByStudentId(student.getId());
+    }
+
+    public void addCourse(
             String name,
             String code,
             String instructor,
-            String description) {
+            String description,
+            Student student) {
+
+        if (student == null || student.getId() == null) {
+            throw new IllegalArgumentException("A logged-in student is required.");
+        }
 
         if (name == null || name.isBlank()) {
-            return;
+            throw new IllegalArgumentException("Please enter a course name.");
         }
 
-        Course course = new Course(
-                nextId.getAndIncrement(),
-                name.trim(),
-                code == null ? "" : code.trim(),
-                instructor == null ? "" : instructor.trim(),
-                description == null ? "" : description.trim()
-        );
+        Course course = new Course();
 
-        courses.add(course);
+        course.setName(name.trim());
+        course.setCode(code == null ? "" : code.trim());
+        course.setInstructor(instructor == null ? "" : instructor.trim());
+        course.setDescription(description == null ? "" : description.trim());
+        course.setStudent(student);
+
+        courseRepository.save(course);
     }
 
-    public synchronized void deleteCourse(Long id) {
-        if (id == null) {
+    @Transactional
+    public void deleteCourse(Long id, Student student) {
+        if (id == null || student == null || student.getId() == null) {
             return;
         }
 
-        courses.removeIf(course -> id.equals(course.getId()));
+        courseRepository.findByIdAndStudentId(id, student.getId())
+                .ifPresent(courseRepository::delete);
     }
 }

@@ -1,15 +1,112 @@
-
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Courses | StudyBuddy</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+
+    <style>
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .profile-menu {
+            position: relative;
+            margin-left: auto;
+        }
+
+        .profile-trigger {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            list-style: none;
+        }
+
+        .profile-trigger::-webkit-details-marker {
+            display: none;
+        }
+
+        .profile-avatar {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #eadcf5;
+            color: #65447c;
+            font-weight: 700;
+        }
+
+        .profile-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            z-index: 100;
+            width: 220px;
+            padding: 14px;
+            background: white;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10);
+        }
+
+        .profile-email {
+            display: block;
+            margin-bottom: 12px;
+            font-size: 12px;
+            color: #777;
+            overflow-wrap: anywhere;
+        }
+
+        .profile-dropdown button {
+            width: 100%;
+            padding: 9px 12px;
+            border: none;
+            border-radius: 8px;
+            background: #f8edf3;
+            color: #70465f;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .profile-dropdown button:hover {
+            background: #f0dce8;
+        }
+
+        @media (max-width: 600px) {
+            .topbar {
+                flex-wrap: wrap;
+            }
+
+            .profile-menu {
+                margin-left: 0;
+            }
+        }
+    </style>
 </head>
+
 <body>
 <div class="app-layout">
 
+    <!-- Sidebar -->
     <aside class="sidebar">
         <div class="brand">Study<span>Buddy</span></div>
         <p class="sidebar-label">WORKSPACE</p>
@@ -18,21 +115,55 @@
             <a th:href="@{/dashboard}">Dashboard</a>
             <a th:href="@{/courses}" class="active">My Courses</a>
             <a th:href="@{/assignments}">Assignments</a>
+            <a th:href="@{/calendar}">Academic Calendar</a>
             <a th:href="@{/planner}">Study Planner</a>
             <a th:href="@{/progress}">My Progress</a>
         </nav>
 
-        <div class="sidebar-bottom">Your personal study space.</div>
+        <div class="sidebar-bottom">
+            Your personal study space.
+        </div>
     </aside>
 
+    <!-- Main content -->
     <main class="main-content">
 
         <header class="topbar">
             <div>
                 <p class="eyebrow">YOUR LEARNING</p>
                 <h1>My Courses</h1>
-                <p class="muted">Organise your subjects in one place.</p>
+                <p class="muted">
+                    Organise your subjects in one place.
+                </p>
             </div>
+
+            <!-- Profile dropdown -->
+            <details class="profile-menu">
+                <summary class="profile-trigger">
+                    <span class="profile-avatar"
+                          th:text="${#strings.substring(#authentication.name, 0, 1).toUpperCase()}">
+                        S
+                    </span>
+
+                    <span class="profile-name">My Account</span>
+                    <span>⌄</span>
+                </summary>
+
+                <div class="profile-dropdown">
+                    <span class="profile-email"
+                          sec:authentication="name">
+                        student@email.com
+                    </span>
+
+                    <form th:action="@{/logout}" method="post">
+                        <input type="hidden"
+                               th:name="${_csrf.parameterName}"
+                               th:value="${_csrf.token}">
+
+                        <button type="submit">Log out</button>
+                    </form>
+                </div>
+            </details>
         </header>
 
         <!-- Add Course Form -->
@@ -46,34 +177,41 @@
                 </div>
             </div>
 
-            <form th:action="@{/courses/add}" method="post"
+            <form th:action="@{/courses/add}"
+                  method="post"
                   class="course-form">
 
                 <div class="form-grid">
 
                     <div class="form-group">
                         <label for="name">Course name *</label>
-                        <input id="name" name="name" type="text"
+                        <input id="name"
+                               name="name"
+                               type="text"
                                placeholder="e.g. Software Engineering"
                                required>
                     </div>
 
                     <div class="form-group">
                         <label for="code">Course code</label>
-                        <input id="code" name="code" type="text"
+                        <input id="code"
+                               name="code"
+                               type="text"
                                placeholder="e.g. SWE201">
                     </div>
 
                     <div class="form-group">
                         <label for="instructor">Instructor</label>
-                        <input id="instructor" name="instructor"
+                        <input id="instructor"
+                               name="instructor"
                                type="text"
                                placeholder="Instructor's name">
                     </div>
 
                     <div class="form-group">
                         <label for="description">Description</label>
-                        <input id="description" name="description"
+                        <input id="description"
+                               name="description"
                                type="text"
                                placeholder="What is this course about?">
                     </div>
@@ -92,20 +230,25 @@
                 <div>
                     <h2>Your subjects</h2>
                     <p class="muted">
-                        <span th:text="${#lists.size(courses)}">0</span>
+                        <span th:text="${courses != null ? #lists.size(courses) : 0}">
+                            0
+                        </span>
                         courses added
                     </p>
                 </div>
             </div>
 
-            <div th:if="${#lists.isEmpty(courses)}"
+            <!-- Empty state -->
+            <div th:if="${courses == null or #lists.isEmpty(courses)}"
                  class="empty-state">
+
                 <h3>No courses yet</h3>
                 <p>Add your first course using the form above.</p>
             </div>
 
+            <!-- Course cards -->
             <div class="course-grid"
-                 th:unless="${#lists.isEmpty(courses)}">
+                 th:if="${courses != null and !#lists.isEmpty(courses)}">
 
                 <article class="course-card"
                          th:each="course : ${courses}">
@@ -114,7 +257,7 @@
                         <div class="course-icon"></div>
 
                         <span class="course-code"
-                              th:text="${course.code != null and !course.code.isBlank() ? course.code : 'COURSE'}">
+                              th:text="${#strings.isEmpty(course.code) ? 'COURSE' : course.code}">
                             COURSE
                         </span>
                     </div>
@@ -124,19 +267,21 @@
                     </h3>
 
                     <p class="muted"
-                       th:if="${course.instructor != null and !course.instructor.isBlank()}"
-                       th:text="'Instructor: ' + ${course.instructor}">
+                       th:if="${!#strings.isEmpty(course.instructor)}"
+                       th:text="'Instructor: ' + course.instructor">
                         Instructor
                     </p>
 
                     <p class="course-description"
-                       th:if="${course.description != null and !course.description.isBlank()}"
+                       th:if="${!#strings.isEmpty(course.description)}"
                        th:text="${course.description}">
                         Course description
                     </p>
 
+                    <!-- Delete course -->
                     <form th:action="@{/courses/delete}"
                           method="post">
+
                         <input type="hidden"
                                name="id"
                                th:value="${course.id}">

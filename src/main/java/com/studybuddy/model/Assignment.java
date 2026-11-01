@@ -1,13 +1,30 @@
-
 package com.studybuddy.model;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "assignments")
 public class Assignment {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private String title;
+
     private String course;
+
     private String dueDate;
+
     private String priority;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "student_id", nullable = false)
+    private Student student;
+
+    public Assignment() {
+    }
 
     public Assignment(Long id, String title, String course,
                       String dueDate, String priority) {
@@ -56,5 +73,13 @@ public class Assignment {
 
     public void setPriority(String priority) {
         this.priority = priority;
+    }
+
+    public Student getStudent() {
+        return student;
+    }
+
+    public void setStudent(Student student) {
+        this.student = student;
     }
 }
